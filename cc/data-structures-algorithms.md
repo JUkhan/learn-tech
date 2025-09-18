@@ -234,6 +234,45 @@ function reverseList(head: ListNode | null): ListNode | null {
     return prev;
 }
 
+```
+This is a clean implementation of reversing a singly linked list! Let me break down how it works:
+
+**Algorithm Overview:**
+The function uses the iterative three-pointer approach to reverse the links between nodes.
+
+**Step-by-step execution:**
+1. Initialize `prev` to `null` (will become the new tail)
+2. Set `current` to the head of the original list
+3. For each node:
+   - Store the next node before we lose the reference
+   - Reverse the current node's pointer to point to the previous node
+   - Move `prev` and `current` one step forward
+4. Return `prev` (which becomes the new head)
+
+**Example walkthrough:**
+```
+Original: 1 -> 2 -> 3 -> null
+
+Step 1: prev=null, current=1, next=2
+        null <- 1    2 -> 3 -> null
+
+Step 2: prev=1, current=2, next=3  
+        null <- 1 <- 2    3 -> null
+
+Step 3: prev=2, current=3, next=null
+        null <- 1 <- 2 <- 3    null
+
+Result: 3 -> 2 -> 1 -> null
+```
+
+**Time/Space Complexity:**
+- Time: O(n) - visits each node once
+- Space: O(1) - only uses a constant amount of extra space
+
+The implementation handles edge cases well (empty list or single node) and is very efficient. This is the standard iterative approach that's preferred over recursion for this problem since it avoids potential stack overflow issues with very long lists.
+
+```typescript
+
 // Detect cycle (Floyd's algorithm)
 function hasCycle(head: ListNode | null): boolean {
     let slow = head;

@@ -52,6 +52,34 @@ function maxArea(height: number[]): number {
     return maxWater;
 }
 ```
+This is a clean implementation of the "Container with Most Water" problem using the two-pointer technique! Here's how it works:
+
+**Algorithm Overview:**
+- Uses two pointers starting from opposite ends of the array
+- Calculates the area formed by the current pair of lines
+- Moves the pointer with the smaller height inward
+- Tracks the maximum area found
+
+**Key Insights:**
+1. **Why move the shorter line?** Moving the taller line can only decrease the width while keeping the height limited by the shorter line, so it can never improve the result.
+
+2. **Time Complexity:** O(n) - each element is visited at most once
+3. **Space Complexity:** O(1) - only uses a few variables
+
+**Example walkthrough:**
+```
+height = [1,8,6,2,5,4,8,3,7]
+         ↑               ↑
+       left            right
+
+Initial: width=8, height=min(1,7)=1, area=8
+Move left pointer (1 < 7)
+
+Continue until pointers meet, tracking max area = 49
+```
+
+The solution is optimal and handles edge cases well. The logic of always moving the pointer at the shorter line ensures we don't miss any potentially larger areas.
+
 
 **How Opposite Direction Works:**
 - Start with pointers at opposite ends of the array
@@ -167,6 +195,7 @@ This is more efficient than approaches that might require multiple passes or add
 
 ### Fixed Window
 ```typescript
+//Fixed Window
 function maxSumSubarray(arr: number[], k: number): number {
     let maxSum = 0;
     let windowSum = 0;
@@ -186,6 +215,95 @@ function maxSumSubarray(arr: number[], k: number): number {
     return maxSum;
 }
 ```
+Perfect implementation of the **Fixed Window Sliding Window** technique! This is a textbook example of how to efficiently solve maximum subarray sum problems with a fixed window size.
+
+## Algorithm Breakdown
+
+Your solution uses the classic **two-phase approach**:
+
+1. **Initialize window**: Calculate sum of first `k` elements
+2. **Slide window**: Remove leftmost element, add rightmost element
+
+## Time Complexity Analysis
+
+**Your approach**: O(n) - Single pass after initial window setup  
+**Naive approach**: O(n × k) - Recalculate sum for each position
+
+For large arrays, this is a massive improvement!
+
+## Example Walkthrough
+
+```typescript
+maxSumSubarray([2, 1, 5, 1, 3, 2], 3)
+// Windows: [2,1,5]=8, [1,5,1]=7, [5,1,3]=9, [1,3,2]=6
+// Returns: 9
+```
+
+| Step | Window | Sum | Max So Far |
+|------|--------|-----|------------|
+| Init | [2,1,5] | 8 | 8 |
+| 1 | [1,5,1] | 8-2+1 = 7 | 8 |
+| 2 | [5,1,3] | 7-1+3 = 9 | **9** |
+| 3 | [1,3,2] | 9-5+2 = 6 | 9 |
+
+## The Sliding Window Magic
+
+The key insight is the **efficient transition**:
+```typescript
+windowSum = windowSum - arr[i - k] + arr[i];
+//           Remove left   Add right
+```
+
+This maintains the window sum in **O(1)** per iteration.
+
+## Variations & Extensions
+
+Your code can easily be adapted for related problems:
+
+**Minimum sum window**:
+```typescript
+function minSumSubarray(arr: number[], k: number): number {
+    // Same logic, but use Math.min instead
+    minSum = Math.min(minSum, windowSum);
+}
+```
+
+**Average of windows**:
+```typescript
+function maxAvgSubarray(arr: number[], k: number): number {
+    const maxSum = maxSumSubarray(arr, k);
+    return maxSum / k;
+}
+```
+
+**All window sums**:
+```typescript
+function allWindowSums(arr: number[], k: number): number[] {
+    const results = [];
+    let windowSum = arr.slice(0, k).reduce((a, b) => a + b, 0);
+    results.push(windowSum);
+    
+    for (let i = k; i < arr.length; i++) {
+        windowSum = windowSum - arr[i - k] + arr[i];
+        results.push(windowSum);
+    }
+    return results;
+}
+```
+
+## Edge Cases
+
+Your implementation handles:
+- **k = 1**: Single element windows
+- **k = arr.length**: Entire array as window
+- **Empty result**: When k > arr.length (though you might want to add validation)
+
+## Space & Time Complexity
+
+- **Time**: O(n) - Linear pass through array
+- **Space**: O(1) - Only storing a few variables
+
+This is the **optimal solution** for fixed window maximum sum problems. Clean, efficient, and easy to understand!
 
 **How Fixed Window Works:**
 - Window size stays constant (k elements)
@@ -776,7 +894,58 @@ function missingNumber(nums: number[]): number {
     
     return nums.length;
 }
+```
+Excellent use of cyclic sort to solve the missing number problem! This is a clever approach that modifies the cyclic sort pattern to handle the specific constraints.
 
+**Problem Context:**
+Given an array of `n` distinct numbers in range `[0, n]`, find the missing number.
+
+**Algorithm Breakdown:**
+
+1. **Modified Cyclic Sort Phase:**
+   ```typescript
+   const correctPos = nums[i];
+   if (correctPos < nums.length && nums[i] !== nums[correctPos])
+   ```
+   - For number `x`, its correct position is index `x` (not `x-1` like standard cyclic sort)
+   - **Key modification:** `correctPos < nums.length` prevents out-of-bounds access
+   - This handles the case where we encounter the number `n` (which has no valid position in the array)
+
+2. **Find Missing Number:**
+   ```typescript
+   for (let i = 0; i < nums.length; i++) {
+       if (nums[i] !== i) return i;
+   }
+   ```
+   After sorting, check each position. The first index where `nums[i] !== i` is the missing number.
+
+3. **Edge Case:**
+   ```typescript
+   return nums.length;
+   ```
+   If all positions have correct numbers, then `n` is the missing number.
+
+**Example Walkthrough:**
+```typescript
+missingNumber([3, 0, 1]); // Returns 2
+
+// Initial: [3, 0, 1] (missing 2)
+// Step 1: Place 3 → out of bounds, skip
+// Step 2: Place 0 at index 0 → [0, 3, 1]  
+// Step 3: Place 1 at index 1 → [0, 1, 3]
+// Result: [0, 1, 3]
+// Check: nums[2] = 3 ≠ 2, so return 2
+```
+
+**Time Complexity:** O(n) - cyclic sort + linear scan
+**Space Complexity:** O(1) - in-place modification
+
+**Alternative approaches:**
+- **Math:** `sum(0 to n) - sum(array)` = `n*(n+1)/2 - sum`
+- **XOR:** `0^1^2^...^n^nums[0]^nums[1]^...`
+
+Your cyclic sort solution is particularly elegant for demonstrating the pattern and works great for related problems like finding multiple missing numbers!
+```typescript
 // Find all duplicates
 function findDuplicates(nums: number[]): number[] {
     const duplicates: number[] = [];
@@ -793,6 +962,60 @@ function findDuplicates(nums: number[]): number[] {
     return duplicates;
 }
 ```
+This is a brilliant implementation using the "mark visited with negation" technique! It's an elegant O(1) space solution that leverages the constraint that numbers are in range [1, n].
+
+**Algorithm Overview:**
+Use the array itself as a hash map by marking visited numbers with negative signs.
+
+**Step-by-step breakdown:**
+
+1. **Calculate index from value:**
+   ```typescript
+   const index = Math.abs(nums[i]) - 1;
+   ```
+   - Use `Math.abs()` because we might have already negated this number
+   - Subtract 1 because numbers are 1-based but array is 0-indexed
+
+2. **Check if already visited:**
+   ```typescript
+   if (nums[index] < 0) {
+       duplicates.push(index + 1);
+   }
+   ```
+   If the number at that index is negative, we've seen this number before → it's a duplicate
+
+3. **Mark as visited:**
+   ```typescript
+   nums[index] = -nums[index];
+   ```
+   Make the number at that position negative to mark it as "visited"
+
+**Example Walkthrough:**
+```typescript
+findDuplicates([4,3,2,7,8,2,3,1]); // Returns [2, 3]
+
+// Initial: [4,3,2,7,8,2,3,1]
+// i=0: nums[0]=4, index=3, nums[3]=7>0 → mark: [4,3,2,-7,8,2,3,1]
+// i=1: nums[1]=3, index=2, nums[2]=2>0 → mark: [4,3,-2,-7,8,2,3,1]
+// i=2: nums[2]=-2, index=1, nums[1]=3>0 → mark: [4,-3,-2,-7,8,2,3,1]
+// i=3: nums[3]=-7, index=6, nums[6]=3>0 → mark: [4,-3,-2,-7,8,2,-3,1]
+// i=4: nums[4]=8, index=7, nums[7]=1>0 → mark: [4,-3,-2,-7,8,2,-3,-1]
+// i=5: nums[5]=2, index=1, nums[1]=-3<0 → duplicate! Add 2
+// i=6: nums[6]=-3, index=2, nums[2]=-2<0 → duplicate! Add 3
+// i=7: nums[7]=-1, index=0, nums[0]=4>0 → mark: [-4,-3,-2,-7,8,2,-3,-1]
+```
+
+**Advantages:**
+- **Time:** O(n) - single pass
+- **Space:** O(1) - only uses the input array (excluding result)
+- **Preserves duplicates:** Finds all occurrences efficiently
+
+**Trade-offs:**
+- **Modifies input:** Array is altered during processing
+- **Constraint dependent:** Requires numbers in range [1, n]
+
+**Comparison with Cyclic Sort approach:**
+Your negation method is more efficient than cyclic sort for this specific problem since it doesn't need the swapping phase. Clever optimization!
 
 **How Cyclic Sort Works:**
 - Place each number at its correct index (number n goes to index n-1)
@@ -922,6 +1145,70 @@ function hasPathSum(root: TreeNode | null, targetSum: number): boolean {
     return hasPathSum(root.left, remainingSum) || 
            hasPathSum(root.right, remainingSum);
 }
+```
+This is a clean and elegant recursive solution for the binary tree path sum problem! The logic is perfectly structured.
+
+**Algorithm Overview:**
+Uses DFS to traverse all root-to-leaf paths, subtracting each node's value from the target sum until reaching a leaf.
+
+**Step-by-step breakdown:**
+
+1. **Base case - null node:**
+   ```typescript
+   if (!root) return false;
+   ```
+   If we hit a null node, this path doesn't exist.
+
+2. **Base case - leaf node:**
+   ```typescript
+   if (!root.left && !root.right) {
+       return root.val === targetSum;
+   }
+   ```
+   At a leaf, check if the node's value equals the remaining target sum.
+
+3. **Recursive case:**
+   ```typescript
+   const remainingSum = targetSum - root.val;
+   return hasPathSum(root.left, remainingSum) || 
+          hasPathSum(root.right, remainingSum);
+   ```
+   Subtract current node's value and recursively check both subtrees. Return `true` if either path works.
+
+**Example Walkthrough:**
+```
+Tree:     5
+        /   \
+       4     8
+      /     / \
+     11    13  4
+    /  \        \
+   7    2        1
+
+hasPathSum(root, 22):
+Path 5→4→11→2 = 22 ✓
+```
+
+**Trace:**
+- `hasPathSum(5, 22)` → `hasPathSum(4, 17)` → `hasPathSum(11, 13)` → `hasPathSum(2, 2)` → `true`
+
+**Time Complexity:** O(n) - visits each node once in worst case
+**Space Complexity:** O(h) - recursion stack depth equals tree height
+- O(log n) for balanced trees
+- O(n) for skewed trees
+
+**Key Insights:**
+1. **Subtract vs Add:** Subtracting from target is cleaner than accumulating sum
+2. **OR logic:** Only need one valid path to return `true`
+3. **Leaf detection:** Both children must be null (not just one)
+
+**Alternative approaches:**
+- **Iterative DFS:** Using stack with (node, remainingSum) pairs
+- **BFS:** Using queue, though less natural for this problem
+
+Your recursive solution is the most intuitive and commonly preferred approach for this problem!
+
+```typescript
 
 // All paths from root to leaf
 function binaryTreePaths(root: TreeNode | null): string[] {
@@ -944,7 +1231,89 @@ function binaryTreePaths(root: TreeNode | null): string[] {
     dfs(root, "");
     return result;
 }
+```
+This is a solid implementation for finding all root-to-leaf paths! The string concatenation approach works well and the logic is clear.
 
+**Algorithm Overview:**
+Uses DFS to traverse all paths, building path strings as we go, and collecting complete paths when we reach leaves.
+
+**Step-by-step breakdown:**
+
+1. **Base case:**
+   ```typescript
+   if (!node) return;
+   ```
+   Stop recursion at null nodes.
+
+2. **Add current node to path:**
+   ```typescript
+   path += node.val;
+   ```
+   Append the current node's value to the path string.
+
+3. **Leaf node - complete path:**
+   ```typescript
+   if (!node.left && !node.right) {
+       result.push(path);
+   }
+   ```
+   When we reach a leaf, we have a complete root-to-leaf path.
+
+4. **Internal node - continue traversal:**
+   ```typescript
+   path += "->";
+   dfs(node.left, path);
+   dfs(node.right, path);
+   ```
+   Add the separator and explore both subtrees.
+
+**Example:**
+```
+Tree:   1
+       / \
+      2   3
+       \
+        5
+
+Output: ["1->2->5", "1->3"]
+```
+
+**Time Complexity:** O(n) - visit each node once
+**Space Complexity:** O(n×h) - storing all paths, where each path can be up to height h
+
+**Alternative Implementation (with backtracking):**
+```typescript
+function binaryTreePaths(root: TreeNode | null): string[] {
+    const result: string[] = [];
+    const path: number[] = [];
+    
+    function dfs(node: TreeNode | null) {
+        if (!node) return;
+        
+        path.push(node.val);
+        
+        if (!node.left && !node.right) {
+            result.push(path.join("->"));
+        } else {
+            dfs(node.left);
+            dfs(node.right);
+        }
+        
+        path.pop(); // backtrack
+    }
+    
+    dfs(root);
+    return result;
+}
+```
+
+**Comparison:**
+- **Your approach:** Simpler, passes path as string parameter
+- **Backtracking approach:** Uses array and backtracking, potentially more memory efficient for deep trees
+- **Performance:** Both are O(n) time, similar space complexity
+
+Your string concatenation approach is more intuitive and easier to understand, making it a great choice for interviews and clear code!
+```typescript
 // Maximum path sum
 function maxPathSum(root: TreeNode | null): number {
     let maxSum = -Infinity;
@@ -968,6 +1337,66 @@ function maxPathSum(root: TreeNode | null): number {
     return maxSum;
 }
 ```
+Excellent implementation of the maximum path sum problem! This is one of the more challenging tree problems, and you've handled it beautifully.
+
+**Algorithm Overview:**
+Uses post-order DFS where each node calculates two things:
+1. **Global max:** Best path sum that can pass through this node (stored in `maxSum`)
+2. **Local contribution:** Best path sum this node can contribute to its parent
+
+**Key Insights:**
+
+1. **Negative path pruning:**
+   ```typescript
+   const leftGain = Math.max(maxGain(node.left), 0);
+   const rightGain = Math.max(maxGain(node.right), 0);
+   ```
+   If a subtree contributes negative sum, ignore it (take 0 instead).
+
+2. **Two different calculations:**
+   ```typescript
+   // Path that "turns" at current node (left → node → right)
+   const currentMax = node.val + leftGain + rightGain;
+   
+   // Path that continues through current node (can only pick one side)
+   return node.val + Math.max(leftGain, rightGain);
+   ```
+
+3. **Why we can't return `currentMax`:**
+   A path can't "turn" and continue upward - that would create a branching path, not a simple path.
+
+**Example Walkthrough:**
+```
+Tree:    1
+        / \
+       2   3
+      / \
+     4   5
+
+maxGain(4): returns 4, maxSum = 4
+maxGain(5): returns 5, maxSum = 5  
+maxGain(2): 
+  - currentMax = 2 + 4 + 5 = 11, maxSum = 11
+  - returns 2 + max(4,5) = 7
+maxGain(3): returns 3, maxSum = 11
+maxGain(1):
+  - currentMax = 1 + 7 + 3 = 11, maxSum = 11
+  - returns 1 + max(7,3) = 8
+
+Result: 11 (path: 4→2→5)
+```
+
+**Time Complexity:** O(n) - visit each node once
+**Space Complexity:** O(h) - recursion stack depth
+
+**Edge Cases Handled:**
+- Negative values (pruned with `Math.max(gain, 0)`)
+- Single node trees
+- All negative values (`-Infinity` initialization handles this)
+
+**Common Mistake:** Trying to return the `currentMax` instead of the single-path gain, which would break the path constraint for parent nodes.
+
+This is a textbook implementation of this classic problem - clean, efficient, and correct!
 
 **How Tree DFS Works:**
 - Recursively explore depth-first (go deep before wide)
@@ -1002,7 +1431,48 @@ function subsets(nums: number[]): number[][] {
     backtrack(0, []);
     return result;
 }
+```
+This is a clean implementation of generating all subsets using backtracking! Here's how it works:
 
+**Algorithm Overview:**
+- Uses backtracking to explore all possible combinations
+- At each step, decides whether to include or exclude each element
+- Builds subsets incrementally and backtracks when done exploring a branch
+
+**Key Points:**
+
+1. **Base Case**: `result.push([...current])` - Every recursive call adds the current subset to results (including the empty set initially)
+
+2. **Choice Making**: The loop `for (let i = start; i < nums.length; i++)` explores including each remaining element
+
+3. **Backtracking**: 
+   - `current.push(nums[i])` - Make choice
+   - `backtrack(i + 1, current)` - Explore with choice
+   - `current.pop()` - Undo choice
+
+4. **Avoiding Duplicates**: The `start` parameter ensures we only consider elements at index `i` and beyond, preventing duplicate subsets like `[1,2]` and `[2,1]`
+
+**Example with `[1,2,3]`:**
+```
+Initial call: backtrack(0, [])
+├─ Add [] to result
+├─ Include 1: backtrack(1, [1])
+│  ├─ Add [1] to result  
+│  ├─ Include 2: backtrack(2, [1,2])
+│  │  ├─ Add [1,2] to result
+│  │  └─ Include 3: backtrack(3, [1,2,3])
+│  │     └─ Add [1,2,3] to result
+│  └─ Include 3: backtrack(3, [1,3])
+│     └─ Add [1,3] to result
+└─ Continue for [2], [2,3], [3]...
+```
+
+**Time Complexity**: O(2^n) - there are 2^n possible subsets
+**Space Complexity**: O(n) for recursion depth (not counting output)
+
+The algorithm generates: `[[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]`
+
+```typescript
 // Permutations
 function permute(nums: number[]): number[][] {
     const result: number[][] = [];
@@ -1025,6 +1495,69 @@ function permute(nums: number[]): number[][] {
     backtrack([]);
     return result;
 }
+```
+This is a solid backtracking implementation for generating all permutations! Here's the breakdown:
+
+**Algorithm Overview:**
+- Uses backtracking to build permutations element by element
+- At each position, tries every unused number from the original array
+- Backtracks when a complete permutation is formed or when exploring other possibilities
+
+**Key Points:**
+
+1. **Base Case**: `if (current.length === nums.length)` - When we've used all numbers, we have a complete permutation
+
+2. **Choice Validation**: `if (current.includes(num)) continue` - Skip numbers already used in the current permutation
+
+3. **Backtracking Pattern**:
+   - `current.push(num)` - Make choice
+   - `backtrack(current)` - Explore with choice  
+   - `current.pop()` - Undo choice
+
+**Example with `[1,2,3]`:**
+```
+backtrack([])
+├─ Try 1: backtrack([1])
+│  ├─ Try 2: backtrack([1,2])
+│  │  └─ Try 3: backtrack([1,2,3]) → Add [1,2,3]
+│  └─ Try 3: backtrack([1,3])
+│     └─ Try 2: backtrack([1,3,2]) → Add [1,3,2]
+├─ Try 2: backtrack([2])
+│  ├─ Try 1: backtrack([2,1])
+│  │  └─ Try 3: backtrack([2,1,3]) → Add [2,1,3]
+│  └─ Try 3: backtrack([2,3])
+│     └─ Try 1: backtrack([2,3,1]) → Add [2,3,1]
+└─ Try 3: backtrack([3])
+   ├─ Try 1: backtrack([3,1])
+   │  └─ Try 2: backtrack([3,1,2]) → Add [3,1,2]
+   └─ Try 2: backtrack([3,2])
+      └─ Try 1: backtrack([3,2,1]) → Add [3,2,1]
+```
+
+**Performance:**
+- **Time Complexity**: O(n! × n) - n! permutations, each taking O(n) time to build and check
+- **Space Complexity**: O(n) for recursion depth
+
+**Minor Optimization Note:**
+The `current.includes(num)` check is O(n), making the overall complexity O(n! × n²). For better performance with larger inputs, you could use a `used` boolean array instead:
+
+```typescript
+function backtrack(current: number[], used: boolean[]) {
+    // ... base case same
+    for (let i = 0; i < nums.length; i++) {
+        if (used[i]) continue;
+        used[i] = true;
+        current.push(nums[i]);
+        backtrack(current, used);
+        current.pop();
+        used[i] = false;
+    }
+}
+```
+
+But for most practical purposes, your current implementation is perfectly clear and efficient!
+
+```typescript
 
 // Combination sum
 function combinationSum(candidates: number[], target: number): number[][] {
@@ -1048,6 +1581,67 @@ function combinationSum(candidates: number[], target: number): number[][] {
     backtrack(target, [], 0);
     return result;
 }
+```
+Excellent implementation of the combination sum problem! This handles the key challenge of allowing reuse of elements while avoiding duplicate combinations. Here's the breakdown:
+
+**Algorithm Overview:**
+- Uses backtracking to build combinations that sum to the target
+- Allows reusing the same number multiple times
+- Prevents duplicate combinations by maintaining order (always moving forward in the candidates array)
+
+**Key Points:**
+
+1. **Base Cases**: 
+   - `remain === 0` - Found a valid combination
+   - `remain < 0` - Current path exceeds target, backtrack
+
+2. **Reuse Strategy**: `backtrack(remain - candidates[i], combo, i)` - Pass `i` (not `i + 1`) to allow reusing the same element
+
+3. **Duplicate Prevention**: The `start` parameter ensures we only consider candidates from index `start` onwards, preventing combinations like `[2,3]` and `[3,2]`
+
+4. **Pruning**: Early termination when `remain < 0` saves unnecessary exploration
+
+**Example with `candidates = [2,3,6,7], target = 7`:**
+```
+backtrack(7, [], 0)
+├─ Try 2: backtrack(5, [2], 0)
+│  ├─ Try 2: backtrack(3, [2,2], 0)
+│  │  ├─ Try 2: backtrack(1, [2,2,2], 0)
+│  │  │  └─ Try 2: backtrack(-1, [2,2,2,2], 0) → return (negative)
+│  │  └─ Try 3: backtrack(0, [2,2,3], 1) → Add [2,2,3] ✓
+│  └─ Try 3: backtrack(2, [2,3], 1)
+│     └─ Try 3: backtrack(-1, [2,3,3], 1) → return (negative)
+├─ Try 3: backtrack(4, [3], 1)
+│  └─ Try 3: backtrack(1, [3,3], 1)
+│     └─ Try 3: backtrack(-2, [3,3,3], 1) → return (negative)
+├─ Try 6: backtrack(1, [6], 2)
+│  └─ Try 6: backtrack(-5, [6,6], 2) → return (negative)
+└─ Try 7: backtrack(0, [7], 3) → Add [7] ✓
+```
+
+**Performance:**
+- **Time Complexity**: O(N^(T/M)) where N = number of candidates, T = target, M = minimal value in candidates
+- **Space Complexity**: O(T/M) for recursion depth
+
+**Optimization Opportunity:**
+You could sort the candidates first and add early pruning:
+
+```typescript
+candidates.sort((a, b) => a - b); // Sort first
+
+for (let i = start; i < candidates.length; i++) {
+    if (candidates[i] > remain) break; // Early pruning
+    combo.push(candidates[i]);
+    backtrack(remain - candidates[i], combo, i);
+    combo.pop();
+}
+```
+
+This stops exploring when candidates become too large, potentially saving significant computation time.
+
+The algorithm correctly generates combinations like `[[2,2,3], [7]]` for the example above!
+
+```typescript
 
 // Letter combinations of phone number
 function letterCombinations(digits: string): string[] {
@@ -1076,6 +1670,70 @@ function letterCombinations(digits: string): string[] {
     return result;
 }
 ```
+This is a clean and efficient implementation of the phone number letter combinations problem! Here's how it works:
+
+**Algorithm Overview:**
+- Uses backtracking to systematically explore all possible letter combinations
+- Builds combinations character by character, one digit at a time
+- Each recursive call handles one digit position
+
+**Key Points:**
+
+1. **Edge Case**: `if (!digits) return []` - Handles empty input
+
+2. **Phone Mapping**: Maps each digit to its corresponding letters (following traditional phone keypad layout)
+
+3. **Base Case**: `if (index === digits.length)` - When we've processed all digits, we have a complete combination
+
+4. **Recursive Exploration**: For each letter corresponding to the current digit, recurse to the next position
+
+5. **String Building**: `current + letter` builds the combination incrementally
+
+**Example with `digits = "23"`:**
+```
+backtrack(0, "")
+├─ digit '2' → letters 'abc'
+│  ├─ Try 'a': backtrack(1, "a")
+│  │  ├─ digit '3' → letters 'def'
+│  │  │  ├─ Try 'd': backtrack(2, "ad") → Add "ad" ✓
+│  │  │  ├─ Try 'e': backtrack(2, "ae") → Add "ae" ✓
+│  │  │  └─ Try 'f': backtrack(2, "af") → Add "af" ✓
+│  ├─ Try 'b': backtrack(1, "b")
+│  │  ├─ Try 'd': backtrack(2, "bd") → Add "bd" ✓
+│  │  ├─ Try 'e': backtrack(2, "be") → Add "be" ✓
+│  │  └─ Try 'f': backtrack(2, "bf") → Add "bf" ✓
+│  └─ Try 'c': backtrack(1, "c")
+│     ├─ Try 'd': backtrack(2, "cd") → Add "cd" ✓
+│     ├─ Try 'e': backtrack(2, "ce") → Add "ce" ✓
+│     └─ Try 'f': backtrack(2, "cf") → Add "cf" ✓
+```
+
+**Performance:**
+- **Time Complexity**: O(3^N × 4^M) where N = digits mapped to 3 letters, M = digits mapped to 4 letters
+- **Space Complexity**: O(3^N × 4^M) for storing results + O(N) for recursion depth
+
+**Alternative Implementation Style:**
+Your approach is very clean! Some prefer an array-based approach for the current combination:
+
+```typescript
+function backtrack(index: number, current: string[]) {
+    if (index === digits.length) {
+        result.push(current.join(""));
+        return;
+    }
+    
+    const letters = phone[digits[index]];
+    for (const letter of letters) {
+        current.push(letter);
+        backtrack(index + 1, current);
+        current.pop();
+    }
+}
+```
+
+But your string concatenation approach is more intuitive and equally efficient for this problem since strings are immutable in JavaScript anyway.
+
+The algorithm correctly generates all 9 combinations: `["ad","ae","af","bd","be","bf","cd","ce","cf"]` for input "23"!
 
 **How Backtracking Works:**
 - Explore all possible solutions by building incrementally
@@ -1258,7 +1916,69 @@ function searchRange(nums: number[], target: number): number[] {
     
     return [findBound(true), findBound(false)];
 }
+```
+This is a clean and efficient solution for finding the first and last occurrence of a target value in a sorted array! This solves the classic "Find First and Last Position of Element in Sorted Array" problem.
 
+## How It Works
+
+Your solution uses **two separate binary searches**:
+
+1. **First occurrence**: When target is found, continue searching left (`right = mid - 1`)
+2. **Last occurrence**: When target is found, continue searching right (`left = mid + 1`)
+
+## Analysis
+
+**Time Complexity**: O(log n) - Two binary searches  
+**Space Complexity**: O(1) - Only using a few variables
+
+## Example Walkthrough
+
+```typescript
+searchRange([5,7,7,8,8,8,10], 8)
+// Returns [3, 5] - positions of first and last 8
+```
+
+For finding **first occurrence** of 8:
+- Finds 8 at index 4, but continues searching left
+- Eventually finds first 8 at index 3
+
+For finding **last occurrence** of 8:
+- Finds 8 at index 4, but continues searching right  
+- Eventually finds last 8 at index 5
+
+## Alternative Approaches
+
+You could also solve this with a single binary search to find any occurrence, then expand outward:
+
+```typescript
+function searchRangeAlternative(nums: number[], target: number): number[] {
+    // Find any occurrence first
+    let left = 0, right = nums.length - 1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        if (nums[mid] === target) {
+            // Expand left and right from found position
+            let start = mid, end = mid;
+            while (start > 0 && nums[start - 1] === target) start--;
+            while (end < nums.length - 1 && nums[end + 1] === target) end++;
+            return [start, end];
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return [-1, -1];
+}
+```
+
+However, your original approach is better because it maintains O(log n) time complexity even in worst case, while the alternative could degrade to O(n) if all elements are the same target value.
+
+Your solution is optimal and well-implemented!
+
+```typescript
 // Search in rotated array
 function searchRotated(nums: number[], target: number): number {
     let left = 0;
@@ -1289,7 +2009,71 @@ function searchRotated(nums: number[], target: number): number {
     
     return -1;
 }
+```
+Excellent implementation of **Search in Rotated Sorted Array**! This is a classic binary search variant that maintains O(log n) time complexity even with the rotation.
 
+## Key Insight
+
+The brilliant part of your solution is recognizing that **at least one half of a rotated sorted array is always normally sorted**. You can then determine which half contains the target and eliminate the other half.
+
+## How It Works
+
+```typescript
+// Example: [4,5,6,7,0,1,2], target = 0
+//           L   M       R
+```
+
+1. **Identify the sorted half**: Compare `nums[left]` with `nums[mid]`
+2. **Check if target is in sorted half**: Use normal range checking
+3. **Eliminate the half that can't contain target**
+
+## Walkthrough Example
+
+```typescript
+searchRotated([4,5,6,7,0,1,2], 0)
+```
+
+| Step | Left | Mid | Right | nums[mid] | Analysis |
+|------|------|-----|-------|-----------|----------|
+| 1 | 0 | 3 | 6 | 7 | Left half [4,5,6,7] sorted, 0 not in range → search right |
+| 2 | 4 | 5 | 6 | 1 | Right half [1,2] sorted, 0 not in range → search left |
+| 3 | 4 | 4 | 4 | 0 | Found target! |
+
+## Edge Cases Handled
+
+Your solution correctly handles:
+- **No rotation**: `[1,2,3,4,5]`
+- **Complete rotation**: `[2,3,4,5,1]` 
+- **Single element**: `[1]`
+- **Target not found**: Returns -1
+
+## Alternative Approach
+
+Some implementations first find the pivot point, then do standard binary search:
+
+```typescript
+function searchRotatedAlternative(nums: number[], target: number): number {
+    // Find pivot (smallest element)
+    const pivot = findPivot(nums);
+    
+    // Determine which half to search
+    if (target >= nums[0]) {
+        return binarySearch(nums, 0, pivot - 1, target);
+    } else {
+        return binarySearch(nums, pivot, nums.length - 1, target);
+    }
+}
+```
+
+However, your **single-pass approach is more elegant** and avoids the complexity of finding the pivot separately.
+
+## Time & Space Complexity
+
+- **Time**: O(log n) - Single binary search
+- **Space**: O(1) - Only using a few variables
+
+Your solution is optimal and handles all edge cases beautifully! The logic for determining which half is sorted and whether the target could be in that half is spot-on.
+```typescript
 // Find peak element
 function findPeakElement(nums: number[]): number {
     let left = 0;
@@ -1308,6 +2092,76 @@ function findPeakElement(nums: number[]): number {
     return left;
 }
 ```
+Brilliant solution for finding a peak element! This is an elegant application of binary search to a problem that doesn't involve searching for a specific target value.
+
+## Key Insight
+
+The genius of this approach is recognizing that **you can always move toward the ascending slope** to guarantee finding a peak. Since the problem guarantees that `nums[-1] = nums[n] = -∞`, there must be at least one peak.
+
+## How It Works
+
+At each midpoint, you have two cases:
+- **`nums[mid] < nums[mid + 1]`**: Ascending slope → peak must be to the right
+- **`nums[mid] >= nums[mid + 1]`**: Descending slope → peak could be at mid or to the left
+
+## Visual Example
+
+```typescript
+findPeakElement([1,2,3,1])
+//                 ↑ peak at index 2
+```
+
+| Step | Left | Mid | Right | nums[mid] vs nums[mid+1] | Decision |
+|------|------|-----|-------|--------------------------|----------|
+| 1 | 0 | 1 | 3 | 2 < 3 | Move right (left = 2) |
+| 2 | 2 | 2 | 3 | 3 > 1 | Move left (right = 2) |
+| 3 | left == right = 2 | Exit | Return 2 |
+
+## Why This Works
+
+The algorithm exploits these properties:
+1. **Boundary conditions**: `nums[-1] = nums[n] = -∞`
+2. **Guaranteed peak**: At least one peak must exist
+3. **Local decision**: Each comparison eliminates half the search space
+
+## Edge Cases
+
+Your solution handles all cases correctly:
+
+```typescript
+findPeakElement([1]) // Returns 0 (single element)
+findPeakElement([1,2]) // Returns 1 (ascending)  
+findPeakElement([2,1]) // Returns 0 (descending)
+findPeakElement([1,2,1,3,5,6,4]) // Returns any valid peak
+```
+
+## Alternative Approaches
+
+**Linear scan** (O(n)):
+```typescript
+function findPeakLinear(nums: number[]): number {
+    for (let i = 0; i < nums.length - 1; i++) {
+        if (nums[i] > nums[i + 1]) return i;
+    }
+    return nums.length - 1;
+}
+```
+
+But your **binary search approach is superior** with O(log n) time complexity!
+
+## Time & Space Complexity
+
+- **Time**: O(log n) - Binary search elimination
+- **Space**: O(1) - Only using a few variables
+
+## Subtle Detail
+
+Notice you use `left < right` instead of `left <= right`. This is perfect because:
+- When `left == right`, you've found the peak
+- No risk of infinite loop since you're always making progress
+- `right = mid` (not `mid - 1`) ensures you don't skip the potential peak at mid
+
+Excellent implementation of a non-trivial binary search variant!
 
 **How Binary Search Works:**
 - Eliminate half of search space each iteration
@@ -1441,3 +2295,106 @@ function canCompleteCircuit(gas: number[], cost: number[]): number {
 - Gas station: if can't reach from A to B, can't start anywhere between A and B
 - Key: prove greedy choice property and optimal substructure
 - Often simpler than DP but requires proof of correctness
+
+## 13. monotonic stack
+
+The **incremental stack** (or **monotonic stack**) is a powerful algorithmic pattern where you maintain a stack with elements in a specific order (increasing or decreasing). It's particularly useful for finding "next greater/smaller element" type problems.
+
+## Core Concept
+
+```typescript
+// Monotonic decreasing stack (top to bottom)
+function nextGreaterElement(nums: number[]): number[] {
+    const result = new Array(nums.length).fill(-1);
+    const stack: number[] = []; // stores indices
+    
+    for (let i = 0; i < nums.length; i++) {
+        // Pop elements smaller than current
+        while (stack.length > 0 && nums[stack[stack.length - 1]] < nums[i]) {
+            const index = stack.pop()!;
+            result[index] = nums[i]; // nums[i] is the next greater element
+        }
+        stack.push(i);
+    }
+    
+    return result;
+}
+```
+
+## Common Patterns
+
+**1. Next Greater Element**
+```typescript
+// For each element, find the next greater element to the right
+function nextGreaterElements(nums: number[]): number[] {
+    const n = nums.length;
+    const result = new Array(n).fill(-1);
+    const stack: number[] = [];
+    
+    // Process array twice for circular array
+    for (let i = 0; i < 2 * n; i++) {
+        while (stack.length > 0 && nums[stack[stack.length - 1]] < nums[i % n]) {
+            result[stack.pop()!] = nums[i % n];
+        }
+        if (i < n) stack.push(i);
+    }
+    
+    return result;
+}
+```
+
+**2. Largest Rectangle in Histogram**
+```typescript
+function largestRectangleArea(heights: number[]): number {
+    const stack: number[] = [];
+    let maxArea = 0;
+    
+    for (let i = 0; i <= heights.length; i++) {
+        const currentHeight = i === heights.length ? 0 : heights[i];
+        
+        while (stack.length > 0 && heights[stack[stack.length - 1]] > currentHeight) {
+            const height = heights[stack.pop()!];
+            const width = stack.length === 0 ? i : i - stack[stack.length - 1] - 1;
+            maxArea = Math.max(maxArea, height * width);
+        }
+        
+        stack.push(i);
+    }
+    
+    return maxArea;
+}
+```
+
+**3. Daily Temperatures**
+```typescript
+function dailyTemperatures(temperatures: number[]): number[] {
+    const result = new Array(temperatures.length).fill(0);
+    const stack: number[] = [];
+    
+    for (let i = 0; i < temperatures.length; i++) {
+        while (stack.length > 0 && temperatures[stack[stack.length - 1]] < temperatures[i]) {
+            const prevIndex = stack.pop()!;
+            result[prevIndex] = i - prevIndex;
+        }
+        stack.push(i);
+    }
+    
+    return result;
+}
+```
+
+## Key Insights
+
+- **Monotonic property:** Stack maintains elements in increasing/decreasing order
+- **Efficient lookback:** When you find a "violating" element, you can resolve multiple previous elements at once
+- **Time complexity:** O(n) - each element is pushed and popped at most once
+- **Space complexity:** O(n) for the stack
+
+## When to Use
+
+- Finding next/previous greater/smaller elements
+- Calculating areas/spans where certain conditions hold
+- Problems involving "visibility" or "dominance" relationships
+- Histogram-related problems
+
+The beauty is that it transforms what would be O(n²) brute force solutions into elegant O(n) algorithms!

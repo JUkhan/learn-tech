@@ -1,0 +1,82 @@
+{
+  "isRange": "false",
+  "selectedField": "type",
+  "selected": [
+    {
+      "value": 30,
+      "count": 3,
+      "checked": true,
+      "style": {
+        "fillPattern": null,
+        "textFillColor": "#222026",
+        "text": null,
+        "pixelDensity": null,
+        "strokeDashstyle": "solid",
+        "strokeWidth": "2",
+        "strokeColor": "#ab0707",
+        "strokeOpacity": null,
+        "fillOpacity": 0.74,
+        "fillColor": "#B0171F",
+        "pointRadius": "14",
+        "graphicName": "square",
+        "textGraphicName": null,
+        "externalGraphic": null,
+        "cursor": "pointer",
+        "display": "",
+        "fontSize": 8
+      },
+      "alias": "District"
+    },
+    {
+      "value": 40,
+      "count": 23,
+      "checked": true,
+      "style": {
+        "fillPattern": null,
+        "textFillColor": "#222026",
+        "text": null,
+        "pixelDensity": null,
+        "strokeDashstyle": "solid",
+        "strokeWidth": "2",
+        "strokeColor": "#f50817",
+        "strokeOpacity": null,
+        "fillOpacity": 0.75,
+        "fillColor": "#f50817",
+        "pointRadius": "14",
+        "graphicName": "circle",
+        "textGraphicName": null,
+        "externalGraphic": null,
+        "cursor": "pointer",
+        "display": "",
+        "fontSize": 8
+      },
+      "alias": "Upazila"
+    },
+    {
+      "value": 50,
+      "count": 228,
+      "checked": true,
+      "style": {
+        "fillPattern": null,
+        "textFillColor": "#222026",
+        "text": null,
+        "pixelDensity": null,
+        "strokeDashstyle": "solid",
+        "strokeWidth": "2",
+        "strokeColor": "#f70724",
+        "strokeOpacity": null,
+        "fillOpacity": 0.75,
+        "fillColor": "#2ec730",
+        "pointRadius": "14",
+        "graphicName": "triangle",
+        "textGraphicName": null,
+        "externalGraphic": null,
+        "cursor": "pointer",
+        "display": "",
+        "fontSize": 8
+      },
+      "alias": "Union"
+    }
+  ],
+  "division": 5
+}

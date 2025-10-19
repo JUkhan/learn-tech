@@ -954,6 +954,30 @@ function sumSubarrayMins(arr: number[]): number {
     
     return result;
 }
+
+function sumOfSubarray2(arr) {
+  let sum = 0,
+    stack = [],
+    len = arr.length,
+    den = 1e9 + 7;
+  for (let i = 0; i < len; i++) {
+    while (stack.length > 0 && arr[i] < stack[stack.length - 1][1]) {
+      const [idx, val] = stack.pop();
+      const left =
+        stack.length > 0 ? idx - stack[stack.length - 1][0] : idx + 1;
+      const right = i - idx;
+      sum = (sum + val * left * right) % den;
+    }
+    stack.push([i, arr[i]]);
+  }
+  for (let i = 0; i < stack.length; i++) {
+    const [idx, val] = stack[i];
+    const left = i > 0 ? idx - stack[i - 1][0] : idx + 1;
+    const right = len - idx;
+    sum = (sum + val * left * right) % den;
+  }
+  return sum;
+}
 ```
 
 ## 5. REMOVE K DIGITS - Greedy monotonic stack
@@ -1159,8 +1183,60 @@ console.log("Trapping Rain Water [0,1,0,2,1,0,1,3,2,1,2,1]:", trap([0,1,0,2,1,0,
 console.log("Max Sliding Window [1,3,-1,-3,5,3,6,7], k=3:", maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3)); // [3,3,5,5,6,7]
 console.log("Remove K Digits '1432219', k=3:", removeKdigits('1432219', 3)); // '1219'
 console.log("Sum Subarray Mins [3,1,2,4]:", sumSubarrayMins([3,1,2,4])); // 17
+
+function minimumSizeSubArrAySum(nums, target) {
+  let minLength = Infinity,
+    left = 0,
+    sum = 0;
+  for (let right = 0; right < nums.length; right++) {
+    sum += nums[right];
+    while (sum >= target) {
+      minLength = Math.min(minLength, right - left + 1);
+      sum -= nums[left];
+      left++;
+    }
+  }
+  return minLength;
+}
+console.log(minimumSizeSubArrAySum([2, 3, 1, 2, 4, 3], 7));
 ```
 
+Here are 6 classic LeetCode dynamic programming problems in JavaScript! Each includes:
+
+## Problems Covered:
+
+1. **Climbing Stairs (#70)** - Easy
+   - Classic intro DP problem, similar to Fibonacci
+   - Pattern: Each state depends on previous 1-2 states
+
+2. **House Robber (#198)** - Medium  
+   - Decision-making DP: rob or skip each house
+   - Pattern: Max of two choices at each step
+
+3. **Coin Change (#322)** - Medium
+   - Unbounded knapsack variant
+   - Pattern: Try all coins for each amount
+
+4. **Longest Increasing Subsequence (#300)** - Medium
+   - Compare current element with all previous
+   - Pattern: 2D iteration, O(n²) solution
+
+5. **Maximum Subarray (#53)** - Medium
+   - Kadane's Algorithm
+   - Pattern: Extend or restart at each position
+
+6. **Unique Paths (#62)** - Medium
+   - 2D grid DP
+   - Pattern: Sum of paths from adjacent cells
+
+## Common DP Patterns:
+
+- **State definition**: What does `dp[i]` represent?
+- **Base cases**: Initialize smallest subproblems
+- **Transition**: How to compute `dp[i]` from previous states
+- **Answer**: Usually `dp[n]` or `max(dp)`
+
+Each problem includes both standard and space-optimized versions where applicable!
 
 ## Tips for Solving Problems
 
